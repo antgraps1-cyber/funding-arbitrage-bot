@@ -1,0 +1,11 @@
+__pycache__/
+*.pyc
+*.pyo
+arb_logs/
+logs/
+trades.csv
+*.csv
+.env
+*.log
+files (2)/
+youtube-shorts-pipeline/
