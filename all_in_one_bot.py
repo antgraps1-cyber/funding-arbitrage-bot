@@ -422,7 +422,7 @@ class Scanner:
             short_ex, long_ex = b.name, a.name
         avg_price = (a.price + b.price) / 2.0
         price_gap_pct = abs(a.price - b.price) / avg_price if avg_price else 0.0
-        net_pct = adj_diff - CONFIG["ROUND_TRIP_COST"]
+        net_pct = raw_diff - CONFIG["ROUND_TRIP_COST"]
         firing_times = []
         if a_fires and a.next_funding:
             firing_times.append(a.next_funding)
@@ -458,9 +458,6 @@ class Scanner:
         avg_vol = sum(vols) / len(vols) if vols else 0.0
         eligible = True
         reasons = []
-        if not a_fires and not b_fires:
-            eligible = False
-            reasons.append("neither fires this hour")
         if net_pct <= 0:
             eligible = False
             reasons.append("net<=0")
