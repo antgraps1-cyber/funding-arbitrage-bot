@@ -53,8 +53,8 @@ except ImportError:
 CONFIG = {
     "HOUR_GRACE_SEC": 120,
     "ENTRY_WINDOW_MIN": 8,
-    "MIN_TIME_TO_FUNDING_MIN": 2.0,
-    "EXIT_DELAY_SEC": 30,
+    "MIN_TIME_TO_FUNDING_MIN": 5.0,
+    "EXIT_DELAY_SEC": 180,
     "TAKER_FEE": 0.0004,
     "SLIPPAGE": 0.0002,
     "BUFFER_RATE": 0.0010,
@@ -416,13 +416,13 @@ class Scanner:
         eff_b = r_b if b_fires else 0.0
         raw_diff = abs(r_a - r_b)
         adj_diff = abs(eff_a - eff_b)
-        if r_a >= r_b:
+        if eff_a >= eff_b:
             short_ex, long_ex = a.name, b.name
         else:
             short_ex, long_ex = b.name, a.name
         avg_price = (a.price + b.price) / 2.0
         price_gap_pct = abs(a.price - b.price) / avg_price if avg_price else 0.0
-        net_pct = raw_diff - CONFIG["ROUND_TRIP_COST"]
+        net_pct = adj_diff - CONFIG["ROUND_TRIP_COST"]
         firing_times = []
         if a_fires and a.next_funding:
             firing_times.append(a.next_funding)
@@ -458,7 +458,10 @@ class Scanner:
         avg_vol = sum(vols) / len(vols) if vols else 0.0
         eligible = True
         reasons = []
-        if net_pct <= 0:
+        if target_ft is None:
+            eligible = False
+            reasons.append("no upcoming funding")
+        elif net_pct <= 0:
             eligible = False
             reasons.append("net<=0")
         if avg_vol < CONFIG["MIN_VOLUME_USDT"]:
