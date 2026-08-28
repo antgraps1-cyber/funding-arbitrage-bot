@@ -1,7 +1,0 @@
-[build]
-builder = "NIXPACKS"
-
-[deploy]
-startCommand = "python all_in_one_bot.py"
-restartPolicyType = "ON_FAILURE"
-restartPolicyMaxRetries = 5
