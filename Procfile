@@ -1,1 +1,1 @@
-web: python all_in_one_bot.py
+web: bash start.sh
