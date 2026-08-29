@@ -1612,9 +1612,13 @@ class ArbitrageBot:
                 cur_gap = abs(cur_buy - cur_sell) / avg if avg else 0.0
                 # Check max hold time
                 hold_min = (utcnow() - self.active_price_trade.entry_time).total_seconds() / 60.0
-                if (cur_gap < CONFIG["PRICE_ARB_EXIT_GAP"] or
-                        hold_min >= CONFIG["PRICE_ARB_MAX_HOLD_MIN"]):
-                    await self.close_price_trade("exit condition met")
+                breakeven_gap = self.active_price_trade.price_gap - (CONFIG.get("PRICE_ARB_ROUND_TRIP_COST", 0.0012))
+                if cur_gap < CONFIG["PRICE_ARB_EXIT_GAP"]:
+                    await self.close_price_trade("exit gap reached (0.05%)")
+                elif hold_min > 15 and cur_gap <= breakeven_gap:
+                    await self.close_price_trade("15+ min hold break-even reached")
+                elif hold_min >= CONFIG["PRICE_ARB_MAX_HOLD_MIN"]:
+                    await self.close_price_trade("max hold time reached")
             except Exception as e:
                 print(f"Error checking price exit: {e}")
 
