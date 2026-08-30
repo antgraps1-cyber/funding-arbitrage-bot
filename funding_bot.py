@@ -224,7 +224,7 @@ class Scanner:
         raw_diff, adj_diff = abs(r_a - r_b), abs(eff_a - eff_b)
         short_ex, long_ex = (a.name, b.name) if eff_a >= eff_b else (b.name, a.name)
         avg_price = (a.price + b.price) / 2.0; gap = abs(a.price - b.price)/avg_price if avg_price else 0.0
-        net_pct = adj_diff - 0.002  # net = funding diff% - 0.2%
+        net_pct = raw_diff - 0.002  # net = funding diff% - 0.2%
         fts = [ft for ft in [a.next_funding if a_fires else None, b.next_funding if b_fires else None] if ft]
         if fts:
             target_ft, later_ft = min(fts), max(fts)
