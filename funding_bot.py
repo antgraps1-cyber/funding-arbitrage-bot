@@ -46,6 +46,7 @@ CONFIG = {
     "MAX_RETRIES": 3,
     "RETRY_DELAY_SEC": 3,
     "FETCH_TIMEOUT_SEC": 30,
+    "MAX_EXIT_WAIT_MIN": 30,  # max minutes to wait for break-even after planned exit
 }
 CONFIG["ROUND_TRIP_COST"] = 4 * CONFIG["TAKER_FEE"] + 4 * CONFIG["SLIPPAGE"]
 
@@ -370,6 +371,21 @@ class FundingBot:
         if (not t.target_funding_time or now >= t.target_funding_time) and (not t.later_funding_time or now >= t.later_funding_time):
             t.funding_collected = True; print(f"*** All funding collected for {t.trade_id}")
 
+    async def _unrealized_price_pnl(self) -> float:
+        """Calculate unrealized PnL from price movement (long + short legs)."""
+        t = self.active_trade
+        if not t: return 0.0
+        long_ex = self._exchange_by_name(t.long_exchange)
+        short_ex = self._exchange_by_name(t.short_exchange)
+        cur_long = await long_ex.get_exit_price(t.symbol, t.entry_price_long)
+        cur_short = await short_ex.get_exit_price(t.symbol, t.entry_price_short)
+        qty_l = t.notional / t.entry_price_long
+        qty_s = t.notional / t.entry_price_short
+        # Long PnL: current - entry, Short PnL: entry - current
+        pnl_l = (cur_long - t.entry_price_long) * qty_l
+        pnl_s = (t.entry_price_short - cur_short) * qty_s
+        return pnl_l + pnl_s
+
     async def close_trade(self, reason: str):
         t = self.active_trade
         if not t: return
@@ -399,7 +415,15 @@ class FundingBot:
                 now = utcnow(); self.scans += 1
                 self.apply_funding()
                 if self.active_trade and self.active_trade.planned_exit_time and now >= self.active_trade.planned_exit_time:
-                    await self.close_trade("planned exit")
+                    # Smart exit: wait for break-even on price-diff PnL
+                    price_pnl = await self._unrealized_price_pnl()
+                    wait_deadline = self.active_trade.planned_exit_time + timedelta(minutes=CONFIG["MAX_EXIT_WAIT_MIN"])
+                    if price_pnl >= 0:
+                        await self.close_trade("planned exit (price PnL OK)")
+                    elif now >= wait_deadline:
+                        await self.close_trade(f"forced exit after {CONFIG['MAX_EXIT_WAIT_MIN']}min wait (price PnL: {price_pnl:+.4f})")
+                    else:
+                        print(f"    Waiting for break-even... price PnL: {price_pnl:+.4f} (timeout in {(wait_deadline-now).total_seconds()/60:.1f}min)")
                 opps = await self.scanner.scan_funding()
                 if not self.active_trade and (b := self.scanner.best(opps)): await self.open_trade(b)
                 self.write_state(opps)

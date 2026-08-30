@@ -133,8 +133,14 @@ class Scanner:
             # Net profit % = Gap - taker fees - transfer fee eqv
             net_profit_pct = gap - (CONFIG["TAKER_FEE"] * 2) - transfer_fee_pct
             
-            va = to_float(ta.get("quoteVolume")) or to_float(ta.get("baseVolume")) * pa
-            vb = to_float(tb.get("quoteVolume")) or to_float(tb.get("baseVolume")) * pb
+            va = to_float(ta.get("quoteVolume"))
+            if not va:
+                bv_a = to_float(ta.get("baseVolume"))
+                va = bv_a * pa if bv_a else 0.0
+            vb = to_float(tb.get("quoteVolume"))
+            if not vb:
+                bv_b = to_float(tb.get("baseVolume"))
+                vb = bv_b * pb if bv_b else 0.0
             mvol = min(va, vb)
             
             eligible, reasons = True, []
