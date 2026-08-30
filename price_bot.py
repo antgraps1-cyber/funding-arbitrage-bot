@@ -215,7 +215,7 @@ class PriceBot:
             "opportunities": [{
                 "symbol": o.symbol, "buy_exchange": o.buy_exchange, "sell_exchange": o.sell_exchange,
                 "buy_price": o.buy_price, "sell_price": o.sell_price, "price_gap_pct": o.price_gap_pct,
-                "volume": o.volume, "eligible": o.eligible
+                "volume": o.volume, "eligible": o.eligible, "skip_reason": o.skip_reason
             } for o in opps[:10]],
             "history": []
         }

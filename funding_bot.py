@@ -316,7 +316,7 @@ class FundingBot:
             "opportunities": [{
                 "symbol": o.symbol, "raw_rate_a": o.raw_rate_a, "raw_rate_b": o.raw_rate_b, "raw_diff": o.raw_diff,
                 "short_exchange": o.short_exchange, "long_exchange": o.long_exchange, "net_pct": o.net_pct,
-                "price_gap_pct": o.price_gap_pct, "eligible": o.eligible
+                "price_gap_pct": o.price_gap_pct, "eligible": o.eligible, "skip_reason": o.skip_reason
             } for o in opps[:10]],
             "history": []
         }
