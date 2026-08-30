@@ -262,6 +262,21 @@ def status():
         'price_history': p_state.get('history', [])[-5:],
     })
 
+@app.route('/api/logs')
+def get_logs():
+    bot_type = os.environ.get("LOG_TYPE", "all")
+    logs = {"funding": "", "price": ""}
+    
+    if os.path.exists("funding.log"):
+        with open("funding.log", "r") as f:
+            logs["funding"] = f.read()[-5000:]
+            
+    if os.path.exists("price.log"):
+        with open("price.log", "r") as f:
+            logs["price"] = f.read()[-5000:]
+            
+    return jsonify(logs)
+
 if __name__ == "__main__":
     print(f"Web dashboard started at http://{CONFIG['WEB_HOST']}:{CONFIG['WEB_PORT']}/")
     app.run(

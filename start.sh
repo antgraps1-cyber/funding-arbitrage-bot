@@ -1,4 +1,4 @@
 #!/bin/bash
-python funding_bot.py &
-python price_bot.py &
-python dashboard.py
+python -u funding_bot.py > funding.log 2>&1 &
+python -u price_bot.py > price.log 2>&1 &
+gunicorn dashboard:app -b 0.0.0.0:$PORT
