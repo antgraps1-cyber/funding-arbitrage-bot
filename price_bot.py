@@ -130,8 +130,8 @@ class Scanner:
             # Gap % calculation for spatial: (sell - buy) / buy
             gap = (sp - bp) / bp
             
-            # Net profit % = Gap - taker fees - transfer fee eqv
-            net_profit_pct = gap - (CONFIG["TAKER_FEE"] * 2) - transfer_fee_pct
+            # Net profit % = Gap - 0.6% (0.006)
+            net_profit_pct = gap - 0.006
             
             va = to_float(ta.get("quoteVolume"))
             if not va:
