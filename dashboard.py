@@ -65,7 +65,7 @@ HTML_TEMPLATE = """
         <h2>💰 Top Price Diff Opportunities</h2>
         <div class="table-wrap"><table id="price-opps-table"><thead><tr>
             <th>#</th><th>Symbol</th><th>Buy Exch</th><th>Sell Exch</th><th>Buy Price</th>
-            <th>Sell Price</th><th>Gap%</th><th>Volume (M)</th><th>Reason (if skip)</th>
+            <th>Sell Price</th><th>Gap%</th><th>Net%</th><th>Volume (M)</th><th>Reason (if skip)</th>
         </tr></thead><tbody id="price-opps-body"></tbody></table></div>
     </div>
 
@@ -139,6 +139,7 @@ function fetchData() {
                     <td>${o.buy_price.toFixed(6)}</td>
                     <td>${o.sell_price.toFixed(6)}</td>
                     <td>${(o.price_gap_pct * 100).toFixed(4)}</td>
+                    <td>${(o.net_profit_pct * 100).toFixed(4)}</td>
                     <td>${(o.volume / 1e6).toFixed(2)}</td>
                     <td>${o.eligible ? '<span class="badge badge-eligible">ELIGIBLE</span>' : '<span class="badge badge-skip">SKIP</span> <span style="font-size:0.8em; color:#e74c3c">' + (o.skip_reason || '') + '</span>'}</td>
                 </tr>

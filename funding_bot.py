@@ -244,7 +244,6 @@ class Scanner:
         if target_ft is None: eligible, reasons = False, reasons + ["no upcoming funding"]
         elif net_pct <= 0: eligible, reasons = False, reasons + ["net<=0"]
         if avg_vol < CONFIG["MIN_VOLUME_USDT"]: eligible, reasons = False, reasons + ["low volume"]
-        if gap > CONFIG["PRICE_GAP_SKIP"]: eligible, reasons = False, reasons + [f"price gap {gap*100:.2f}%"]
         if 0 < ttf < CONFIG["MIN_TIME_TO_FUNDING_MIN"]: eligible, reasons = False, reasons + ["too close"]
         if ttf <= 0: eligible, reasons = False, reasons + ["funding already passed"]
         if entry_open and now < entry_open: eligible, reasons = False, reasons + ["window not open"]
