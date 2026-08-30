@@ -23,7 +23,7 @@ CONFIG = {
     "PRICE_ARB_MIN_VOLUME_USDT": 1_000_000,
     "PRICE_ARB_CSV_FILE": "price_trades.csv",
     "TAKER_FEE": 0.001,                       # 0.1% spot taker fee typical for Binance/Bybit
-    "ESTIMATED_TRANSFER_FEE_USDT": 1.0,       # $1 typical transfer fee
+    "TRANSFER_FEE_PCT": 0.005,                # 0.5% constant transfer fee for all coins
     "INITIAL_BALANCE": 27.48,
     "SCAN_INTERVAL": 60,
     "PROXY": None,
@@ -117,7 +117,7 @@ class Scanner:
         
         opps = []
         usdt_notional = CONFIG["INITIAL_BALANCE"] * CONFIG["PRICE_ARB_CAPITAL_PCT"]
-        transfer_fee_pct = (CONFIG["ESTIMATED_TRANSFER_FEE_USDT"] / usdt_notional) if usdt_notional > 0 else 999.0
+        transfer_fee_pct = CONFIG["TRANSFER_FEE_PCT"]
         
         for sym in self.common_symbols:
             ta, tb = t_a.get(sym), t_b.get(sym)
@@ -246,7 +246,7 @@ class PriceBot:
         bx.balance -= buy_notional
         
         # Simulate transfer fee (deducted before selling)
-        transfer_fee = CONFIG["ESTIMATED_TRANSFER_FEE_USDT"]
+        transfer_fee = net_buy_usdt * CONFIG["TRANSFER_FEE_PCT"]
         
         # Sell on sx
         gross_sell_usdt = coins_bought * opp.sell_price
